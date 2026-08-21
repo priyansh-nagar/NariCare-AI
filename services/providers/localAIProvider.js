@@ -81,9 +81,10 @@ export class LocalAIProvider extends BaseLLMProvider {
       content: prompt.trim()
     });
 
-    const isBrowser = typeof window !== 'undefined';
-    const primaryEndpoint = `${this.baseUrl}/v1/chat/completions`;
-    const proxyEndpoint = '/v1/chat/completions';
+   const isBrowser = typeof window !== 'undefined';
+const primaryEndpoint = isBrowser
+  ? '/api/chat'
+  : `${this.baseUrl}/v1/chat/completions`;
     const requestId = `req_cloud_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
     console.log(`[NariCare AI Engine] START requestId=${requestId} model=${this.model} endpoint=${primaryEndpoint}`);
@@ -92,9 +93,10 @@ export class LocalAIProvider extends BaseLLMProvider {
       'Content-Type': 'application/json'
     };
 
-    if (this.apiKey) {
-      headers['Authorization'] = `Bearer ${this.apiKey}`;
-      headers['X-Api-Key'] = this.apiKey;
+   if (!isBrowser && this.apiKey) {
+  headers['Authorization'] = `Bearer ${this.apiKey}`;
+  headers['X-Api-Key'] = this.apiKey;
+
     }
 
     const requestBodyOpenAI = {
